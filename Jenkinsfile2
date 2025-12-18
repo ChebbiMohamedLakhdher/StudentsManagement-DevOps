@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven'  // Make sure this is configured in Jenkins → Tools
+        maven 'M2_HOME'  // Make sure this is configured in Jenkins → Tools
     }
 
     environment {

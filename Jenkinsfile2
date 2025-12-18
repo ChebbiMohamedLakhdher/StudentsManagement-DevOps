@@ -1,29 +1,33 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven'  // Make sure this is configured in Jenkins → Tools
+    }
+
     environment {
-        SONAR_TOKEN = credentials('sonarqube-token') // ID du token SonarQube dans Jenkins
+        SONAR_TOKEN = credentials('sonarqube-token')
+        SONAR_HOST_URL = 'http://http://192.168.33.10:9000'  // Adjust if needed
     }
 
     stages {
-        stage('Checkout Jenkins Repo') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/ChebbiMohamedLakhdher/StudentsManagement-DevOps.git'
+                checkout scm  // Simpler checkout
             }
         }
 
         stage('Maven SonarQube Analysis') {
             steps {
-                dir('StudentsManagement-DevOps') { // ← on se déplace dans le sous-dossier du projet Maven
-                    script {
-                        withSonarQubeEnv('SonarQube') {
-                            sh """
-                                mvn clean package -DskipTests sonar:sonar \
-                                -Dsonar.projectKey=StudentsManagement-DevOps \
-                                -Dsonar.login=${SONAR_TOKEN} \
-                                -Dsonar.java.binaries=target/classes
-                            """
-                        }
+                script {
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                            mvn clean package -DskipTests sonar:sonar \
+                            -Dsonar.projectKey=StudentsManagement-DevOps \
+                            -Dsonar.login=${SONAR_TOKEN} \
+                            -Dsonar.java.binaries=target/classes \
+                            -Dsonar.host.url=${SONAR_HOST_URL}
+                        """
                     }
                 }
             }
